@@ -1,7 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:spacexplorer/screens/dashboard.dart';
+import 'package:flutter/services.dart';
+import 'package:spacexplorer/providers/spacex.dart';
+import 'package:spacexplorer/screens/appscaffold.dart';
+import 'package:spacexplorer/screens/company_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:spacexplorer/screens/dragon_screen.dart';
+import 'package:spacexplorer/screens/launches_screen.dart';
+import 'package:spacexplorer/screens/rocket_screen.dart';
+import 'package:spacexplorer/screens/starlink_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // adding app overlay transparent
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+
   runApp(MyApp());
 }
 
@@ -9,75 +25,26 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SpaceXplorer',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: DashboardScreen(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: SpaceX(),
+        )
+      ],
+      child: Consumer<SpaceX>(
+        builder: (ctx, spaceXdata, _) => MaterialApp(
+          title: 'SpaceXplorer',
+          home: AppScaffold(),
+          debugShowCheckedModeBanner: false,
+          routes: {
+            CompanyScreen.routeName: (ctx) => CompanyScreen(),
+            RocketScreen.routeName: (ctx) => RocketScreen(),
+            DragonScreen.routeName: (ctx) => DragonScreen(),
+            LaunchesScreen.routeName: (ctx) => LaunchesScreen(),
+            StarlinkScreen.routeName: (ctx) => StarlinkScreen()
+          },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
